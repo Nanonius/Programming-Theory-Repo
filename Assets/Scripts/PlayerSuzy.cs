@@ -2,32 +2,60 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerSuzy : CharacterBase
+public class PlayerSuzy : CharacterBase //Inheritance
 {
+    private float speedMultiplier = 2f;
+    private float jumpForce1 = 3f;
+    private float jumpForce2 = 1f;
+
+    private Rigidbody2D rb;
     // Start is called before the first frame update
     void Start()
     {
-        
+        rb = GetComponent<Rigidbody2D>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        Run(speedMultiplier);
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Jump();
+        }
+        if (rb.velocity.x < 0.1f)
+        {
+            Idle();
+        }
     }
 
-    protected override void Jump(int numberOfJumps, float jump1VerticalForce, float jump2VerticalForce, bool floatAbility)
+    private void Jump()
     {
-
+        Jump(jumpForce1, jumpForce2, true); //Polymorphism
     }
 
-    protected override void Run()
-    {
 
+    private void Run()
+    {
+        Run(speedMultiplier); //Polymorphism
     }
 
     protected override void Idle()
     {
-        //Rotate back and forth
+        base.Idle();
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Coin"))
+        {
+            GameManager.Instance.coins++;
+            GameManager.Instance.coinsText.text = $"Coins: {GameManager.Instance.coins} / 5";
+        }
+
+        if (collision.gameObject.CompareTag("Flag"))
+        {
+            GameManager.Instance.GameFinished();
+        }
     }
 }
