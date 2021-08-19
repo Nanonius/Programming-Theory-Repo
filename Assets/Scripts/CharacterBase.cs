@@ -1,10 +1,12 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CharacterBase : MonoBehaviour
 {
     protected bool jumped;
+    public float runSpeed;
+    public float rotationDistance;
+    public float rotationSpeed;
 
     // Start is called before the first frame update
     void Start()
@@ -15,32 +17,29 @@ public class CharacterBase : MonoBehaviour
     //Polymorphism, three types of Jump functions
     protected virtual void Jump(float jumpVerticalForce)
     {
-        StopCoroutine(IdleRotation());
-        GetComponent<Rigidbody2D>().AddForce(new Vector2(transform.position.x, jumpVerticalForce), ForceMode2D.Impulse);
+        GetComponent<Rigidbody2D>().AddForce(new Vector2(0, jumpVerticalForce), ForceMode2D.Impulse);
     }
 
     protected virtual void Jump(float jump1VerticalForce, float jump2VerticalForce)
     {
-        StopCoroutine(IdleRotation());
         if (jumped) //Second jump
         {
             jumped = false;
-            GetComponent<Rigidbody2D>().AddForce(new Vector2(transform.position.x, jump2VerticalForce), ForceMode2D.Impulse);
+            GetComponent<Rigidbody2D>().AddForce(new Vector2(0, jump2VerticalForce), ForceMode2D.Impulse);
         }
         else //First jump
         {
-            GetComponent<Rigidbody2D>().AddForce(new Vector2(transform.position.x, jump1VerticalForce), ForceMode2D.Impulse);
+            GetComponent<Rigidbody2D>().AddForce(new Vector2(0, jump1VerticalForce), ForceMode2D.Impulse);
         }
         jumped = true;
     }
 
     protected virtual void Jump(float jump1VerticalForce, float jump2VerticalForce, bool floatAbility)
     {
-        StopCoroutine(IdleRotation());
         if (jumped) //Second jump
         {
             jumped = false;
-            GetComponent<Rigidbody2D>().AddForce(new Vector2(transform.position.x, jump2VerticalForce), ForceMode2D.Impulse);
+            GetComponent<Rigidbody2D>().AddForce(new Vector2(0, jump2VerticalForce), ForceMode2D.Impulse);
             while(Input.GetKey(KeyCode.Space))
             {
                 Physics2D.gravity *= 0.1f;
@@ -48,29 +47,17 @@ public class CharacterBase : MonoBehaviour
         }
         else //First jump
         {
-            GetComponent<Rigidbody2D>().AddForce(new Vector2(transform.position.x, jump1VerticalForce), ForceMode2D.Impulse);
+            GetComponent<Rigidbody2D>().AddForce(new Vector2(0, jump1VerticalForce), ForceMode2D.Impulse);
         }
         jumped = true;
     }
 
-    protected virtual void Run(float speedMultiplier)
+    protected virtual void Run()
     {
-        StopCoroutine(IdleRotation());
         float horizontalInput = Input.GetAxis("Horizontal");
+        Vector3 pos = transform.position;
 
-        GetComponent<Rigidbody2D>().AddForce(new Vector2(horizontalInput * speedMultiplier * Time.deltaTime, transform.position.y));
-    }
-
-    protected virtual void Idle()
-    {
-        StartCoroutine(IdleRotation());
-    }
-
-    private IEnumerator IdleRotation()
-    {
-        transform.Rotate(new Vector3(0, 0, 10f));
-        yield return new WaitForSeconds(0.5f);
-        transform.Rotate(new Vector3(0, 0, -15f));
-        StartCoroutine(IdleRotation());
+        pos.x += horizontalInput * runSpeed * Time.deltaTime;
+        transform.position = pos;
     }
 }

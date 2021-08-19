@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 #if UNITY_EDITOR
@@ -15,10 +13,12 @@ public class TitleManager : MonoBehaviour
     public GameObject startElementsGO;
     public GameObject characterSelectionGO;
 
+    PersistentData persistentData;
 
     // Start is called before the first frame update
     void Start()
     {
+        persistentData = GameObject.Find("PersistentData").GetComponent<PersistentData>();
         startElementsGO.SetActive(true);
         characterSelectionGO.SetActive(false);
 
@@ -59,8 +59,8 @@ public class TitleManager : MonoBehaviour
         startElementsGO.SetActive(false);
         characterSelectionGO.SetActive(true);
 
-        GameManager.Instance.isNormalGame = true;
-        GameManager.Instance.isSpeedrun = false;
+        persistentData.isNormalGame = true;
+        persistentData.isSpeedrun = false;
     }
 
     public void PlaySpeedrun() //From title screen
@@ -68,30 +68,31 @@ public class TitleManager : MonoBehaviour
         startElementsGO.SetActive(false);
         characterSelectionGO.SetActive(true);
 
-        GameManager.Instance.isNormalGame = false;
-        GameManager.Instance.isSpeedrun = true;
+        persistentData.isNormalGame = false;
+        persistentData.isSpeedrun = true;
     }
 
     private void StartGame() //From character selection
     {
         if (isBob)
         {
-            GameManager.Instance.isBob = true;
-            GameManager.Instance.isJim = false;
-            GameManager.Instance.isSuzy = false;
+            persistentData.isBob = true;
+            persistentData.isJim = false;
+            persistentData.isSuzy = false;
         }
         else if(isJim)
         {
-            GameManager.Instance.isBob = false;
-            GameManager.Instance.isJim = true;
-            GameManager.Instance.isSuzy = false;
+            persistentData.isBob = false;
+            persistentData.isJim = true;
+            persistentData.isSuzy = false;
         }
         else if (isSuzy)
         {
-            GameManager.Instance.isBob = false;
-            GameManager.Instance.isJim = false;
-            GameManager.Instance.isSuzy = true;
+            persistentData.isBob = false;
+            persistentData.isJim = false;
+            persistentData.isSuzy = true;
         }
+        SceneManager.LoadScene(1);
     }
 
     public void QuitGame()

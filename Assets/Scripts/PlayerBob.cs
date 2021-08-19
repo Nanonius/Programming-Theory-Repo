@@ -1,11 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerBob : CharacterBase //Inheritance
 {
-    private float speedMultiplier = 2f;
-    private float jumpForce = 5f;
+    public float jumpForce = 10f;
 
     private Rigidbody2D rb;
     // Start is called before the first frame update
@@ -17,14 +14,10 @@ public class PlayerBob : CharacterBase //Inheritance
     // Update is called once per frame
     void Update()
     {
-        Run(speedMultiplier);
+        Running();
         if (Input.GetKeyDown(KeyCode.Space))
         {
             Jump();
-        }
-        if(rb.velocity.x < 0.1f)
-        {
-            Idle();
         }
     }
 
@@ -33,15 +26,13 @@ public class PlayerBob : CharacterBase //Inheritance
         Jump(jumpForce); //Polymorphism
     }
 
-
-    private void Run()
+    private void Running()
     {
-        Run(speedMultiplier); //Polymorphism
-    }
+        float horizontalInput = Input.GetAxis("Horizontal");
+        Vector3 pos = transform.position;
 
-    protected override void Idle()
-    {
-        base.Idle();
+        pos.x += horizontalInput * runSpeed * Time.deltaTime;
+        transform.position = pos;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

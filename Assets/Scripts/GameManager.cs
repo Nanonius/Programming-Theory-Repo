@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
@@ -50,14 +48,6 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI timerText;
     public TextMeshProUGUI coinsText;
 
-    //Bools
-    public bool isBob;
-    public bool isJim;
-    public bool isSuzy;
-
-    public bool isNormalGame;
-    public bool isSpeedrun;
-
     //Ints
     private int m_coins;
     public int coins //Encapsulation
@@ -100,6 +90,8 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    PersistentData persistentData;
+
     private void Awake()
     {
         if (Instance != null)
@@ -116,15 +108,16 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        persistentData = GameObject.Find("PersistentData").GetComponent<PersistentData>();
         finishedObjectsGO.SetActive(false);
         speedrunObjectsGO.SetActive(false);
         highscoreTableObjectsGO.SetActive(false);
 
-        if (isNormalGame)
+        if (persistentData.isNormalGame)
         {
             NormalGameSetup(); //Abstraction
         }
-        else if (isSpeedrun)
+        else if (persistentData.isSpeedrun)
         {
             SpeedrunGameSetup(); //Abstraction
         }
@@ -132,7 +125,7 @@ public class GameManager : MonoBehaviour
 
     private void NormalGameSetup()
     {
-        isNormalGame = true;
+        persistentData.isNormalGame = true;
         m_coins = 0;
         foreach (GameObject go in coinsGOArray)
         {
@@ -146,7 +139,7 @@ public class GameManager : MonoBehaviour
 
     private void SpeedrunGameSetup()
     {
-        isSpeedrun = true;
+        persistentData.isSpeedrun = true;
         timerText.enabled = true;
         coinsText.enabled = false;
         coinsGO.SetActive(false);
@@ -155,24 +148,24 @@ public class GameManager : MonoBehaviour
 
     private void InstantiateCharacter()
     {
-        if (isBob)
+        if (persistentData.isBob)
         {
-            BOB = Instantiate(bobGO, new Vector3(20.42f, 92.35f, 0f), bobGO.transform.rotation);
+            BOB = Instantiate(bobGO, new Vector3(20.42f, 92.5f, 0f), bobGO.transform.rotation);
         }
-        else if (isJim)
+        else if (persistentData.isJim)
         {
-            JIM = Instantiate(jimGO, new Vector3(20.42f, 92.35f, 0f), bobGO.transform.rotation);
+            JIM = Instantiate(jimGO, new Vector3(20.42f, 92.5f, 0f), bobGO.transform.rotation);
         }
-        else if (isSuzy)
+        else if (persistentData.isSuzy)
         {
-            SUZY = Instantiate(suzyGO, new Vector3(20.42f, 92.35f, 0f), bobGO.transform.rotation);
+            SUZY = Instantiate(suzyGO, new Vector3(20.42f, 92.5f, 0f), bobGO.transform.rotation);
         }
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (isSpeedrun)
+        if (persistentData.isSpeedrun)
         {
             RunTimer(); //Abstraction
         }
@@ -186,9 +179,7 @@ public class GameManager : MonoBehaviour
 
     public void GameFinished()
     {
-        isSpeedrun = false;
-        isNormalGame = false;
-        if (isNormalGame)
+        if (persistentData.isNormalGame)
         {
             if (m_coins == 5)
             {
@@ -203,12 +194,14 @@ public class GameManager : MonoBehaviour
             speedrunObjectsGO.SetActive(false);
             highscoreTableObjectsGO.SetActive(false);
         }
-        else if (isSpeedrun)
+        else if (persistentData.isSpeedrun)
         {
             finishedObjectsGO.SetActive(false);
             speedrunObjectsGO.SetActive(true);
             highscoreTableObjectsGO.SetActive(false);
         }
+        persistentData.isSpeedrun = false;
+        persistentData.isNormalGame = false;
     }
 
     public void SetupHighscores()
@@ -279,15 +272,15 @@ public class GameManager : MonoBehaviour
 
     private void DestroyPlayer()
     {
-        if (isBob)
+        if (persistentData.isBob)
         {
             Destroy(BOB);
         }
-        else if (isJim)
+        else if (persistentData.isJim)
         {
             Destroy(JIM);
         }
-        else if (isSuzy)
+        else if (persistentData.isSuzy)
         {
             Destroy(SUZY);
         }
@@ -296,11 +289,11 @@ public class GameManager : MonoBehaviour
     public void PlayAgain()
     {
         DestroyPlayer();
-        if (isNormalGame)
+        if (persistentData.isNormalGame)
         {
             NormalGameSetup();
         }
-        else if (isSpeedrun)
+        else if (persistentData.isSpeedrun)
         {
             SpeedrunGameSetup();
         }

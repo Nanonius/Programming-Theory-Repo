@@ -1,12 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerSuzy : CharacterBase //Inheritance
 {
-    private float speedMultiplier = 2f;
-    private float jumpForce1 = 3f;
-    private float jumpForce2 = 1f;
+    private float jumpForce1 = 6f;
+    private float jumpForce2 = 2f;
 
     private Rigidbody2D rb;
     // Start is called before the first frame update
@@ -18,14 +15,10 @@ public class PlayerSuzy : CharacterBase //Inheritance
     // Update is called once per frame
     void Update()
     {
-        Run(speedMultiplier);
+        Run();
         if (Input.GetKeyDown(KeyCode.Space))
         {
             Jump();
-        }
-        if (rb.velocity.x < 0.1f)
-        {
-            Idle();
         }
     }
 
@@ -34,15 +27,9 @@ public class PlayerSuzy : CharacterBase //Inheritance
         Jump(jumpForce1, jumpForce2, true); //Polymorphism
     }
 
-
-    private void Run()
+    protected override void Run()
     {
-        Run(speedMultiplier); //Polymorphism
-    }
-
-    protected override void Idle()
-    {
-        base.Idle();
+        base.Run();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
