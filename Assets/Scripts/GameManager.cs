@@ -39,6 +39,7 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI enteredName;
 
     //Gameobjects
+    public GameObject restartButtonGO;
     public GameObject finishedObjectsGO;
     public GameObject speedrunObjectsGO;
     public GameObject highscoreTableObjectsGO;
@@ -142,6 +143,7 @@ public class GameManager : MonoBehaviour
 
     private void NormalGameSetup()
     {
+        restartButtonGO.SetActive(false);
         finishedObjectsGO.SetActive(false);
         speedrunObjectsGO.SetActive(false);
         highscoreTableObjectsGO.SetActive(false);
@@ -176,10 +178,19 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(1f);
         countdownText.enabled = false;
         countdownText.gameObject.SetActive(false);
+        restartButtonGO.SetActive(true);
+    }
+
+    public void RestartSpeedrun()
+    {
+        normalrunIsStarted = false;
+        speedrunIsStarted = false;
+        PlayAgain();
     }
 
     private void SpeedrunGameSetup()
     {
+        restartButtonGO.SetActive(false);
         finishedObjectsGO.SetActive(false);
         speedrunObjectsGO.SetActive(false);
         highscoreTableObjectsGO.SetActive(false);
@@ -228,6 +239,7 @@ public class GameManager : MonoBehaviour
 
     public void GameFinished()
     {
+        restartButtonGO.SetActive(false);
         if (persistentData.isNormalGame)
         {
             if (m_coins == 5)
