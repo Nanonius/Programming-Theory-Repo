@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class PlayerBob : CharacterBase //Inheritance
 {
-    public float jumpForce = 10f;
+    private float jumpForce = 15f;
 
     private Rigidbody2D rb;
     // Start is called before the first frame update
@@ -14,10 +14,13 @@ public class PlayerBob : CharacterBase //Inheritance
     // Update is called once per frame
     void Update()
     {
-        Running();
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (GameManager.Instance.speedrunIsStarted || GameManager.Instance.normalrunIsStarted)
         {
-            Jump();
+            Run();
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                Jump();
+            }
         }
     }
 
@@ -26,13 +29,9 @@ public class PlayerBob : CharacterBase //Inheritance
         Jump(jumpForce); //Polymorphism
     }
 
-    private void Running()
+    protected override void Run()
     {
-        float horizontalInput = Input.GetAxis("Horizontal");
-        Vector3 pos = transform.position;
-
-        pos.x += horizontalInput * runSpeed * Time.deltaTime;
-        transform.position = pos;
+        base.Run();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -47,6 +46,15 @@ public class PlayerBob : CharacterBase //Inheritance
         if (collision.gameObject.CompareTag("Flag"))
         {
             GameManager.Instance.GameFinished();
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Tilemap"))
+        {
+            isOnGround = true;
+            jumps = 0;
         }
     }
 }

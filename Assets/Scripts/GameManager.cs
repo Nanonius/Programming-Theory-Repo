@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
@@ -46,7 +47,13 @@ public class GameManager : MonoBehaviour
     //Text
     public TextMeshProUGUI finishedText;
     public TextMeshProUGUI timerText;
+    public TextMeshProUGUI countdownText;
     public TextMeshProUGUI coinsText;
+
+    //Bools
+    [HideInInspector]
+    public bool speedrunIsStarted;
+    public bool normalrunIsStarted;
 
     //Ints
     private int m_coins;
@@ -108,10 +115,20 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        if (timePlayer1 == 0 && timePlayer2 == 0 && timePlayer3 == 0)
+        {
+            timePlayer1 = 100f;
+            timePlayer2 = 100f;
+            timePlayer3 = 100f;
+            player1Text.text = "Player";
+            player2Text.text = "Player";
+            player3Text.text = "Player";
+            timePlayer1Text.text = "100.0 sec.";
+            timePlayer2Text.text = "100.0 sec.";
+            timePlayer3Text.text = "100.0 sec.";
+        }
+
         persistentData = GameObject.Find("PersistentData").GetComponent<PersistentData>();
-        finishedObjectsGO.SetActive(false);
-        speedrunObjectsGO.SetActive(false);
-        highscoreTableObjectsGO.SetActive(false);
 
         if (persistentData.isNormalGame)
         {
@@ -125,25 +142,57 @@ public class GameManager : MonoBehaviour
 
     private void NormalGameSetup()
     {
+        finishedObjectsGO.SetActive(false);
+        speedrunObjectsGO.SetActive(false);
+        highscoreTableObjectsGO.SetActive(false);
         persistentData.isNormalGame = true;
         m_coins = 0;
+
         foreach (GameObject go in coinsGOArray)
         {
             go.SetActive(true);
         }
+
         timerText.enabled = false;
+        countdownText.enabled = false;
         coinsText.enabled = true;
+        coinsText.gameObject.SetActive(true);
         coinsGO.SetActive(true);
         InstantiateCharacter();
+        Camera.main.GetComponent<FollowPlayer>().PlayerReference();
+        normalrunIsStarted = true;
+    }
+
+    IEnumerator SpeedrunCountdown()
+    {
+        countdownText.text = "3";
+        yield return new WaitForSeconds(1f);
+        countdownText.text = "2";
+        yield return new WaitForSeconds(1f);
+        countdownText.text = "1";
+        yield return new WaitForSeconds(1f);
+        countdownText.text = "GO!";
+        speedrunIsStarted = true;
+        yield return new WaitForSeconds(1f);
+        countdownText.enabled = false;
+        countdownText.gameObject.SetActive(false);
     }
 
     private void SpeedrunGameSetup()
     {
+        finishedObjectsGO.SetActive(false);
+        speedrunObjectsGO.SetActive(false);
+        highscoreTableObjectsGO.SetActive(false);
         persistentData.isSpeedrun = true;
         timerText.enabled = true;
+        timerText.gameObject.SetActive(true);
+        countdownText.enabled = true;
+        countdownText.gameObject.SetActive(true);
         coinsText.enabled = false;
         coinsGO.SetActive(false);
         InstantiateCharacter();
+        Camera.main.GetComponent<FollowPlayer>().PlayerReference();
+        StartCoroutine(SpeedrunCountdown());
     }
 
     private void InstantiateCharacter()
@@ -165,7 +214,7 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (persistentData.isSpeedrun)
+        if (persistentData.isSpeedrun && speedrunIsStarted)
         {
             RunTimer(); //Abstraction
         }
@@ -200,30 +249,32 @@ public class GameManager : MonoBehaviour
             speedrunObjectsGO.SetActive(true);
             highscoreTableObjectsGO.SetActive(false);
         }
-        persistentData.isSpeedrun = false;
-        persistentData.isNormalGame = false;
+        normalrunIsStarted = false;
+        speedrunIsStarted = false;
     }
 
     public void SetupHighscores()
     {
         if (timer < timePlayer1)
         {
+            timePlayer1 = timer;
             currentPlayerRankingText.text = "1)";
             currentPlayerNameText.text = enteredName.text;
             timeCurrentPlayerText.text = timer.ToString("0.0");
 
             //Moves player 1 stats down and player 2 stats down and replaces 1 player stats with the current stats
-            player2Text.text = player1Text.text;
-            timePlayer2Text.text = timePlayer1Text.text;
-
             player3Text.text = player2Text.text;
             timePlayer3Text.text = timePlayer2Text.text;
+
+            player2Text.text = player1Text.text;
+            timePlayer2Text.text = timePlayer1Text.text;
 
             player1Text.text = currentPlayerNameText.text;
             timePlayer1Text.text = timeCurrentPlayerText.text;
         }
         else if (timer < timePlayer2)
         {
+            timePlayer2 = timer;
             currentPlayerRankingText.text = "2)";
             currentPlayerNameText.text = enteredName.text;
             timeCurrentPlayerText.text = timer.ToString("0.0");
@@ -237,6 +288,7 @@ public class GameManager : MonoBehaviour
         }
         else if (timer < timePlayer3)
         {
+            timePlayer3 = timer;
             currentPlayerRankingText.text = "3)";
             currentPlayerNameText.text = enteredName.text;
             timeCurrentPlayerText.text = timer.ToString("0.0");
@@ -255,9 +307,13 @@ public class GameManager : MonoBehaviour
 
     public void ResetAllHighscores()
     {
-        timePlayer1 = 0;
-        timePlayer2 = 0;
-        timePlayer3 = 0;
+        timePlayer1 = 100;
+        timePlayer2 = 100;
+        timePlayer3 = 100;
+
+        timePlayer1Text.text = "100.0 sec.";
+        timePlayer2Text.text = "100.0 sec.";
+        timePlayer3Text.text = "100.0 sec.";
 
         player1Text.text = "Player";
         player2Text.text = "Player";
@@ -289,13 +345,6 @@ public class GameManager : MonoBehaviour
     public void PlayAgain()
     {
         DestroyPlayer();
-        if (persistentData.isNormalGame)
-        {
-            NormalGameSetup();
-        }
-        else if (persistentData.isSpeedrun)
-        {
-            SpeedrunGameSetup();
-        }
+        SceneManager.LoadScene(1);
     }
 }

@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class PlayerJim : CharacterBase //Inheritance
 {
-    private float jumpForce1 = 6f;
-    private float jumpForce2 = 4f;
+    private float jumpForce1 = 12f;
+    private float jumpForce2 = 9f;
 
     private Rigidbody2D rb;
     // Start is called before the first frame update
@@ -15,10 +15,13 @@ public class PlayerJim : CharacterBase //Inheritance
     // Update is called once per frame
     void Update()
     {
-        Run();
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (GameManager.Instance.speedrunIsStarted || GameManager.Instance.normalrunIsStarted)
         {
-            Jump();
+            Run();
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                Jump();
+            }
         }
     }
 
@@ -38,11 +41,21 @@ public class PlayerJim : CharacterBase //Inheritance
         {
             GameManager.Instance.coins++;
             GameManager.Instance.coinsText.text = $"Coins: {GameManager.Instance.coins} / 5";
+            collision.gameObject.SetActive(false);
         }
 
         if (collision.gameObject.CompareTag("Flag"))
         {
             GameManager.Instance.GameFinished();
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Tilemap"))
+        {
+            isOnGround = true;
+            jumps = 0;
         }
     }
 }

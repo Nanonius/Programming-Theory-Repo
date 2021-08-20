@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Coin
   - Flag
+  - Tilemap
   layers:
   - Default
   - TransparentFX

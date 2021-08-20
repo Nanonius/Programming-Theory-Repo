@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 3317405185647012791}
   m_Layer: 0
   m_Name: Suzy
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -100,7 +100,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 2
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
@@ -134,6 +134,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20d14310985c44548b870c53241d2fa5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  runSpeed: 0
-  rotationDistance: 0
-  rotationSpeed: 0
+  runSpeed: 10

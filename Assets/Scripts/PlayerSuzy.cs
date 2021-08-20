@@ -2,23 +2,27 @@ using UnityEngine;
 
 public class PlayerSuzy : CharacterBase //Inheritance
 {
-    private float jumpForce1 = 6f;
-    private float jumpForce2 = 2f;
+    private float jumpForce1 = 12f;
+    private float jumpForce2 = 6f;
 
     private Rigidbody2D rb;
     // Start is called before the first frame update
     void Start()
     {
+        isOnGround = true;
         rb = GetComponent<Rigidbody2D>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        Run();
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (GameManager.Instance.speedrunIsStarted || GameManager.Instance.normalrunIsStarted)
         {
-            Jump();
+            Run();
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                Jump();
+            }
         }
     }
 
@@ -38,11 +42,21 @@ public class PlayerSuzy : CharacterBase //Inheritance
         {
             GameManager.Instance.coins++;
             GameManager.Instance.coinsText.text = $"Coins: {GameManager.Instance.coins} / 5";
+            collision.gameObject.SetActive(false);
         }
 
         if (collision.gameObject.CompareTag("Flag"))
         {
             GameManager.Instance.GameFinished();
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Tilemap"))
+        {
+            isOnGround = true;
+            jumps = 0;
         }
     }
 }
